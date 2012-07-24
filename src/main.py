@@ -27,37 +27,76 @@ red = (255, 0, 0)
 blue = (0, 0, 255)
 yellow = (255, 255, 0)
 
-n = 100
+n = 1420
 primes = primes(n)
 
-size = [20 * n + 100, 700]
+size = [1200, 700]
 screen = pygame.display.set_mode(size)
 clock = pygame.time.Clock()
 pygame.display.set_caption("PRiME")
 done = False
 radiuslist = []
+
+keystate_left = False
+keystate_right = False
+keystate_up = False
+keystate_down = False
+x_speed = 0
+y_speed = 0
+stepnum = 20
+
 for x in primes:
     radiuslist.append(20)
 while done == False:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            menudone = True
+            done = True
+
+        # User pressed down on a key
+        if event.type == pygame.KEYDOWN:
+            # Figure out if it was an arrow key. If so
+            # adjust speed.
+            if event.key == pygame.K_LEFT:
+                x_speed += 300
+            if event.key == pygame.K_RIGHT:
+                x_speed += -300
+            if event.key == pygame.K_UP:
+                stepnum *= 1.5
+                
+            if event.key == pygame.K_DOWN:
+                stepnum *= 0.5
+                if(stepnum < 1):
+                    stepnum = 1
+                
+                 
+        # User let up on a key
+        if event.type == pygame.KEYUP:
+            # If it is an arrow key, reset vector back to zero
+            if event.key == pygame.K_LEFT:
+                x_speed += 0
+            if event.key == pygame.K_RIGHT:
+                x_speed += 0
+            if event.key == pygame.K_UP:
+                y_speed += 0
+            if event.key == pygame.K_DOWN:
+                y_speed += 0
+    
     screen.fill(black)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             done = True
     i = 0
     for x in primes:
-        y = x * 20
+        y = x * stepnum
         #pygame.draw.circle(screen, white, (y * 2, 350), 4, 0)
-        radiuslist[i] += random.randint(-1, 1)
-        if(radiuslist[i] > 40):
-            radiuslist[i] = 40
-        if(radiuslist[i] < 1):
-            radiuslist[i] = 1
-        while (y < 20 * n):
+
+        while (y < stepnum * n):
             
-            pygame.draw.circle(screen, red, (y, 350), (radiuslist[i] * x), 1)
-            y += 40 * x
+            pygame.draw.circle(screen, red, (int(y + x_speed), int(350 + y_speed)), int(stepnum * x), 1)
+            y += stepnum * 2 * x
         i += 1
     pygame.display.flip()
        
-    clock.tick(60)
+    clock.tick(5)
 pygame.quit()
